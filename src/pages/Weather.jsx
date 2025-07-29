@@ -1,24 +1,36 @@
-import { useState, useEffect } from 'react'
-import './Weather.css'
+import { useState, useEffect } from 'react';
+import { useApi } from '../hooks/useApi';
+import ApiService from '../services/api';
+import './Weather.css';
 
 const Weather = () => {
-  const [weatherData, setWeatherData] = useState([])
-  const [loading, setLoading] = useState(false)
+  // API hook
+  const {
+    data: apiWeather,
+    loading,
+    error,
+    execute: fetchWeather
+  } = useApi(ApiService.getWeather);
 
-  // Generate 7 days weather data starting from today
-  const generateWeatherData = () => {
-    const today = new Date()
-    const data = []
-    const conditions = ['sunny', 'cloudy', 'rainy', 'partly-cloudy']
-    const conditionNames = ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy']
+  // Load weather data
+  useEffect(() => {
+    fetchWeather();
+  }, [fetchWeather]);
+
+  // Generate mock 7 days weather data
+  const generateMockWeatherData = () => {
+    const today = new Date();
+    const data = [];
+    const conditions = ['sunny', 'cloudy', 'rainy', 'partly-cloudy'];
+    const conditionNames = ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'];
     
     for (let i = 0; i < 7; i++) {
-      const date = new Date(today)
-      date.setDate(today.getDate() + i)
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
       
-      const randomCondition = Math.floor(Math.random() * conditions.length)
-      const baseTemp = 15 + Math.floor(Math.random() * 15) // 15-30°C base
-      const tempRange = Math.floor(Math.random() * 8) + 3 // 3-10°C range
+      const randomCondition = Math.floor(Math.random() * conditions.length);
+      const baseTemp = 15 + Math.floor(Math.random() * 15);
+      const tempRange = Math.floor(Math.random() * 8) + 3;
       
       data.push({
         id: i + 1,
@@ -26,84 +38,71 @@ const Weather = () => {
         temp: `${baseTemp}-${baseTemp + tempRange}°C`,
         condition: conditionNames[randomCondition],
         icon: conditions[randomCondition]
-      })
+      });
     }
     
-    return data
-  }
+    return data;
+  };
 
-  useEffect(() => {
-    // Simulate API call
-    setLoading(true)
-    setTimeout(() => {
-      setWeatherData(generateWeatherData())
-      setLoading(false)
-    }, 500)
-  }, [])
+  // Use API data if available, otherwise use mock data
+  const weatherData = apiWeather?.data || apiWeather?.forecast || generateMockWeatherData();
 
   const WeatherIcon = ({ type }) => {
     const iconStyle = {
       stroke: '#1c3e60',
       strokeWidth: 1,
       fill: 'none',
-      width: '60px',
-      height: '60px'
-    }
+      width: '45px',
+      height: '45px'
+    };
 
     const sunPaths = (
       <>
-        <circle cx="30" cy="30" r="8" />
-        <path d="M30 6v4M30 50v4M6 30h4M50 30h4M11.5 11.5l2.8 2.8M45.7 45.7l2.8 2.8M11.5 48.5l2.8-2.8M45.7 14.3l2.8-2.8" />
+        <circle cx="22.5" cy="22.5" r="6" />
+        <path d="M22.5 4.5v3M22.5 37.5v3M4.5 22.5h3M37.5 22.5h3M8.625 8.625l2.1 2.1M34.275 34.275l2.1 2.1M8.625 36.375l2.1-2.1M34.275 10.725l2.1-2.1" />
       </>
-    )
+    );
 
-    const cloudPath = <path d="M46 24c0-8.8-7.2-16-16-16s-16 7.2-16 16c-4.4 0-8 3.6-8 8s3.6 8 8 8h30c3.3 0 6-2.7 6-6s-2.7-6-6-6z" />
+    const cloudPath = <path d="M34.5 18c0-6.6-5.4-12-12-12s-12 5.4-12 12c-3.3 0-6 2.7-6 6s2.7 6 6 6h22.5c2.475 0 4.5-2.025 4.5-4.5s-2.025-4.5-4.5-4.5z" />;
 
     const rainPaths = (
       <>
         {cloudPath}
-        <path d="M20 42v8M24 44v6M28 42v8M32 44v6M36 42v8" />
+        <path d="M15 31.5v6M18 33v4.5M21 31.5v6M24 33v4.5M27 31.5v6" />
       </>
-    )
+    );
 
     switch(type) {
       case 'sunny':
-        return <svg style={iconStyle} className="weather-icon">{sunPaths}</svg>
+        return <svg style={iconStyle} className="weather-icon">{sunPaths}</svg>;
       case 'cloudy':
-        return <svg style={iconStyle} className="weather-icon">{cloudPath}</svg>
+        return <svg style={iconStyle} className="weather-icon">{cloudPath}</svg>;
       case 'rainy':
-        return <svg style={iconStyle} className="weather-icon">{rainPaths}</svg>
+        return <svg style={iconStyle} className="weather-icon">{rainPaths}</svg>;
       case 'partly-cloudy':
         return (
           <svg style={iconStyle} className="weather-icon">
-            <circle cx="25" cy="25" r="6" />
-            <path d="M25 8v3M25 40v3M8 25h3M40 25h3M14 14l2 2M34 34l2 2M14 36l2-2M34 16l2-2" />
-            <path d="M40 20c0-6-4.5-10-10-10s-10 4-10 10c-3 0-5.5 2.5-5.5 5.5S17 31 20 31h18c2.2 0 4-1.8 4-4s-1.8-4-4-4z" />
+            <circle cx="18.75" cy="18.75" r="4.5" />
+            <path d="M18.75 6v2.25M18.75 30v2.25M6 18.75h2.25M30 18.75h2.25M10.5 10.5l1.5 1.5M25.5 25.5l1.5 1.5M10.5 27l1.5-1.5M25.5 12l1.5-1.5" />
+            <path d="M30 15c0-4.5-3.375-7.5-7.5-7.5s-7.5 3-7.5 7.5c-2.25 0-4.125 1.875-4.125 4.125S12.75 23.25 15 23.25h13.5c1.65 0 3-1.35 3-3s-1.35-3-3-3z" />
           </svg>
-        )
+        );
       default:
-        return <svg style={iconStyle} className="weather-icon">{sunPaths}</svg>
+        return <svg style={iconStyle} className="weather-icon">{sunPaths}</svg>;
     }
-  }
+  };
 
   const getDayLabel = (dateStr, index) => {
-    const date = new Date(dateStr)
-    const today = new Date()
-    const tomorrow = new Date(today)
-    tomorrow.setDate(today.getDate() + 1)
-
-    if (index === 0) {
-      return 'Today'
-    } else if (index === 1) {
-      return 'Tomorrow'
-    } else {
-      return date.toLocaleDateString('en-US', { 
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      })
-    }
-  }
+    if (index === 0) return 'Today';
+    if (index === 1) return 'Tomorrow';
+    
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   if (loading) {
     return (
@@ -113,7 +112,7 @@ const Weather = () => {
           <p>Loading weather forecast...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -123,9 +122,15 @@ const Weather = () => {
         <p>Scroll horizontally to see more days</p>
       </div>
       
+      {error && (
+        <div className="error-indicator">
+          <p>Failed to load weather. Showing sample data.</p>
+        </div>
+      )}
+      
       <div className="weather-scroll-container">
         {weatherData.map((day, index) => (
-          <div key={day.id} className="weather-day">
+          <div key={day.id || index} className="weather-day">
             <div className="weather-date">
               {getDayLabel(day.date, index)}
             </div>
@@ -153,7 +158,7 @@ const Weather = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Weather
+export default Weather;
