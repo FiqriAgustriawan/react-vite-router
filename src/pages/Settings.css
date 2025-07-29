@@ -1,0 +1,99 @@
+.settings-page {
+  padding-bottom: 1rem;
+}
+
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-item {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+.setting-label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.theme-options,
+.toggle-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radio-option,
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  transition: all 0.2s ease;
+}
+
+.radio-option:hover,
+.toggle-option:hover {
+  background-color: rgba(28, 62, 96, 0.1);
+}
+
+.radio-option input[type="radio"],
+.toggle-option input[type="radio"] {
+  margin: 0;
+}
+
+.radio-option input[type="radio"]:checked + span,
+.toggle-option input[type="radio"]:checked {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.radio-option:has(input:checked),
+.toggle-option:has(input:checked) {
+  background-color: rgba(28, 62, 96, 0.1);
+  border-color: var(--primary-color);
+}
+
+.about-info {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.about-info p {
+  margin: 0.5rem 0;
+  color: var(--text-color);
+}
+
+@media (max-width: 480px) {
+  .theme-options,
+  .toggle-container {
+    flex-direction: column;
+  }
+  
+  .radio-option,
+  .toggle-option {
+    width: 100%;
+    justify-content: center;
+  }
+}
